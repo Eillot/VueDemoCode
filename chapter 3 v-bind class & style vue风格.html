@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title></title>
+<script src="vue.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+<div id="app">
+	
+	<h2>{{name_vbind_01}}</h2>
+	<h4>{{message_vbind_01}}</h4>
+	<h4>{{message_vbind_02}}</h4>
+	<!-- 使用v-bind绑定1个class属性并渲染 -->
+	<!-- 使用v-bind绑定多个class属性通过传入布尔值来控制是否渲染 -->
+	<!-- 使用v-bind绑定单个或多个class属性并切换 -->
+    <!--当data里面定义的isActive等于true时，is-active这个类才会被添加起作用-->
+	<!--当data里面定义的isclose等于true时，is-close这个类才会被添加起作用-->
+	<!-- class类作为key , 布尔值作为value -->
+	<div v-bind:class="{'is-active':isActive,'is-close':isClose}">class类实现方式：v-bind绑定多个class属性并切换</div>
+	<!--  布尔值作为key前置决定是否渲染 ,class类作为value 提供属性支持，二者以数组的细形式组成集合 -->
+	<div v-bind:class="[ isActive ? 'active' : '', isGreen ? 'green' : '']">装载class类数组实现的方式：v-bind绑定多个class属性并切换</div>
+	
+	<!--在vue实例的data中定义了classObject对象，这个对象里面是所有类名及其真值-->
+	<!--当里面的类的值是true时会被渲染-->
+	<!-- 数据对象包含俩个class类的属性bind_class_attr,green为true 时进行渲染false不渲染 -->
+	<div :class="bindClassObj">直接绑定数据对象自定义属性并渲染</div>
+		
+	<!-- 使用v-bind绑定class类具备的style自定义属性&外部类属性 -->
+	<div v-bind:style="{color:style_color, fontSize:style_size, background: isGreen ? '#008F00' : ''}">使用v-bind绑定class类具备的style属性</div>
+
+</div>
+<script type="text/javascript">
+var vm = new Vue({
+	el : "#app",
+	data : {
+		name_vbind_01:"Class属性绑定的实现",
+		message_vbind_01: "v-bind用来动态的绑定一个或者多个特性(说人话：v-bind可以绑定class 并同其他class自由切花，比如按钮点下开启、再点下关闭)。没有参数时，可以绑定到一个包含键值对的对象。常用于动态绑定class和style。以及href等。简写为一个冒号【 ：】",
+		message_vbind_02:"v-bind还可以绑定很多其他的属性,查看API : https://cn.vuejs.org/v2/api/#v-bind",
+		isActive : false,
+		isGreen : false,
+		isClose :true,
+		color : "#FFFFFF",
+		size : '50px',
+		isRed : true,
+		
+		bindClassObj: {
+			'bind_class_attr':true,
+			'green':true
+		  },
+		  
+		styleObject: {
+		    style_color : "#FFF00F",
+		    style_size:"20px"
+		  }	
+	}
+});
+</script>
+<style>
+/* 设置class类对象test,green,active的属性可以与javav类比 */
+.test{font-size:30px,background:#008F00;}
+.green{color:#00FF00;}
+.active{background:#FF0000;}
+.is-active{color:#008F00;}
+.is-close{background-color: #FFFF90;}
+.bind_class_attr{background-color: #F04F90;}
+</style>
+</body>
+</html>
