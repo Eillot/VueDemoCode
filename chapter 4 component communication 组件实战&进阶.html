@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>组件通信</title>
+ <!-- 初始化本地 vue.js 完毕 -->
+<script src="vue.js" type="text/javascript" charset="utf-8"></script>
+</head> 
+<body>
+	<div id="app">
+		<h2>{{ name_01 }}</h2>
+		<h2>{{message_01}}</h2>
+		<!-- 组件基本用法渲染结果为template中的内容：组件基础用法-->
+		<my-component></my-component>
+		
+	  <h2>{{ name_02 }}</h2>
+	  <h2>{{message_02}}</h2>
+	  <!-- 自定义子组件接收来自父组件数据并渲染 -->
+	  <child-component message="我是来自父组件的数据使用props数组的形式"></child-component>
+	  
+	  <h3>{{ name_03 }}</h3>
+	  <h3>{{message_03}}</h3>
+	  <child-component-02 v-bind:height=true></child-component-02>
+	  
+	  <h3>{{ name_04 }}</h3>
+	  <h3>{{message_04}}</h3>
+	  <h3>{{message}}</h3>
+	  <child-component-03 ></child-component-03>
+	  
+	  <h3>{{name_05}}</h3>
+	  <h3>{{message_05}}</h3>
+	  <p>总数：{{total}}</p>
+	  <child-component-04 v-modle="total"></child-component-04>
+	  
+	  <h3>{{name_06}}</h3>
+	  <h3>{{message_06}}</h3>
+	  <child-component-05></child-component-05>
+	  
+	  
+    </div>
+	
+	<!-- Vue.js 的核心是一个允许采用简洁的模板语法来声明式地将数据渲染进 DOM 的系统 -->
+	<script type="text/javascript">
+	
+
+	//组件基础用法
+    Vue.component('my-component',{
+		template:'<div>组件基础用法</div>'
+	});
+	
+	//自定义子组件child-component,使用数组的形式
+	Vue.component('child-component',{
+		props:["message"],
+		template:'<div>{{message}}</div>'});
+	
+	//自定义子组件child-component-02,使用对象的形式,来做各种验证
+	Vue.component('child-component-02',{
+		props:{ 
+				// 检测类型
+				height: Boolean
+				},
+		  template: '<div>{{height}}</div>'
+
+	});
+	
+	//声明父组件component的vue对象
+	var bus = new Vue();
+	//自定义子组件child-component-03,监听父组件事件并回传数据至父组件渲染
+	Vue.component('child-component-03',{
+		//绑定监听器onClickListener
+		template:'<button v-on:click="onClickListener"></button>',
+		methods:{
+			//定义监听事件onClickListener
+			onClickListener: function(){
+				//回调监听器onClickListener，父组件对象bus绑定emit关键字，作为载体回传给父组件
+				bus.$emit('on-message','我是来自父组件child-component-03的数据')
+				console.log("我回传给父组件数据了")
+			}
+		}
+	});
+	
+	//v-model与组件component的联动实现双向数据绑定
+	Vue.component('child-component-04',{
+		//以数组形式使用props声明父子组件属性
+		props:['value'],
+		//父子组件渲染模板
+		template: '<input :value="value" @input="updateValue">',
+		methods:{
+			updateValue: function(event){
+				//这里可以写一些对事件的处理逻辑，逻辑功能执行完毕后，在使用emit回传给父组件并渲染
+				this.$emit('input',event.target.value);
+			}
+		}
+	});	
+	
+	Vue.component('child-component-05',{
+		template:'\<div>\ <slot>\ <h3>我是父组件插槽内容</h3>\ </slot>\ </div>'
+	});
+	
+	var app = new Vue({
+		el: "#app",  //el表示元素element
+		data: {      //view要展示的数据结构体内容
+			name_01: "组件基本用法",
+			message_01:'创建并申明组件后，在template中写渲染实现的方式',
+			
+			name_02: "父子组件通信使用props是单向的、即只要父组件发生变化、子组件立即更新",
+			message_02:'在子组件中使用props关键字声明需要从父组件接收数据，并在自定义template模板中引用，为渲染做准备',
+			
+			name_03: "父子组件通信---props传入对象，（对象）语法提供验证,v-bind绑定对象属性并渲染",
+			message_03:'使用对象作为替代，对象允许配置高级选项，如类型检测、自定义验证和设置默认值。',
+			
+			name_04: "非父子组件通信---兄弟组件通信、跨多级组件通信",
+			message_04:'子组件监听父组件各种（比如：点击、搜索）事件后，回传给父组件并渲染',
+			message:'',
+			
+			name_05: "组件与v-model联动使用props与emit关键字实现父子组件双向绑定。常应用于下拉框、输入框关键字查询",
+			message_05:'v-model表单控件常用于网页数据的录入与交互，可以将组件与指令相互搭配诞生新的强化组件',
+			total : 0,
+			
+			//非项目必须,了解即可，等用到在深入理解
+			name_06: "父组件与slot插槽的使用,将组件内容(数据)进行分发",
+			message_06:'slot起到插槽作用，获取父组件数据的参数，最具代表性的就是列表组件',
+		},
+		//钩子函数mounted 实例被挂载后调用--child-component-03 函数方法
+		mounted: function(){
+			//this指函数本身
+			var _this = this;
+			//在实例初始化时，监听来自bus实例的操作
+			bus.$on ('on-message', function (msg){
+				console.log("bus实例初始化时、我监听到了bus上的自定义事件");
+				_this.message = msg;
+			});
+		},
+		
+		//child-component-04 方法
+		methods:{
+			handleReduce: function(){
+				this.total--;
+			}
+		}
+	});
+	</script>
+</body>
+</html>
